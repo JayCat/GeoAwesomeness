@@ -29,16 +29,15 @@ app.post('/mylocation', function(req, res){
     polls[poll][id]['latitude'] = req.body.latitude;
     polls[poll][id]['longitude'] = req.body.longitude;
 
-    //res.json(true)
-    res.json(polls)
+    res.json(true)
 });
 
 app.get('/getlocations/:poll', function(req, res){
-    if(req.params.id < 0) {
+    if(!(req.params.poll in polls)) {
         res.statusCode = 404;
         return res.send('Error: Poll does not exist');
     }
-    res.json(polls[req.params.id])
+    res.json(polls[req.params.poll])
 });
 
 app.listen(process.env.PORT || 80);
