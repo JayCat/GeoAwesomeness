@@ -2,49 +2,87 @@
 
 var GeoAwesomeness = function () {
     
-    var createNewPosition, setCenter, setMarker, initialize, initializeMap,
-        map, properties;
+    // Constants
+    var DEFAULT_ZOOM_LEVEL = 13;
+    var DEFAULT_LATITUDE = 0;
+    var DEFAULT_LONGITUDE = 0;
 
-    properties = {
-        latitude: 0,
-        longitude: 0
-    };
+    var createNewPosition, setCenter, setMarker, initialize, initializeMap, initializeGeolocation, createMap,
+        map, markers, pollLocation, properties, myId;
 
-    createNewPosition = function ( lat, lng ) {
-        return new google.maps.LatLng( lat, lng );
+    pollLocation = {};
+    markers = [];
+
+    createNewPosition = function ( latitude, longitude ) {
+        return new google.maps.LatLng( latitude, longitude );
     }
 
-    setCenter = function ( lat, lng ) {
-        map.setCenter( createNewPosition( lat, lng ) );
+    setCenter = function ( latitude, longitude ) {
+        map.setCenter( createNewPosition( latitude, longitude ) );
     }
 
-    setMarker = function ( lat, lng, title ) {
+    setMarker = function ( latitude, longitude, title ) {
         title = title ? title : 'Default title';
         var marker = new google.maps.Marker({
-            position: createNewPosition( lat, lng ),
+            position: createNewPosition( latitude, longitude ),
             map: map,
             title: title
         });
     }
 
     initializeMap = function () {
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                position.latitude = position.coords.latitude;
-                position.longitude = position.coords.longitude;
-                var mapOptions = {
-                    zoom: 8,
-                    center: createNewPosition( position.latitude, position.longitude )
-                };
-                map = new google.maps.Map( document.getElementById( 'map-canvas' ), mapOptions );
-                setMarker( position.latitude, position.longitude );
-            });
-        } else {
-            alert('Geolocation is not available');
+        var latitude = DEFAULT_LATITUDE, longitude = DEFAULT_LONGITUDE;
+        if (pollLocation !== {}) {
+            latitude = pollLocation.latitude;
+            longitude = pollLocation.longitude;
         }
+
+        var mapOptions = {
+            zoom: DEFAULT_ZOOM_LEVEL,
+            center: createNewPosition( latitude, longitude )
+        };
+
+        map = new google.maps.Map( document.getElementById( 'map-canvas' ), mapOptions );
     }
 
-    this.initialize = function () {
+    initializeGeolocation = function () {
+        if ("geolocation" in navigator) {
+            var geolocationOptions = {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            };
+
+            function success(position) {                
+                setCenter( position.coords.latitude, position.coords.longitude )
+                setMarker( position.coords.latitude, position.coords.longitude );
+            };
+
+            function error(err) {
+                console.warn('ERROR(' + err.code + '): ' + err.message);
+            };
+
+            navigator.geolocation.getCurrentPosition(success, error, geolocationOptions);
+        } 
+        else {
+            alert('Geolocation is not available');
+        }
+        // setTimeout(initializeGeolocation,4000);
+    }
+
+    createMap = function () {
         google.maps.event.addDomListener( window, 'load', initializeMap );
     }
+
+    this.initialize = function ( initialLocation, userId ) {
+        myId = userId;
+        if ( pollLocation !== null && pollLocation !== 'undefined' ) {
+            pollLocation = initialLocation;
+        }
+        createMap();
+        initializeGeolocation();
+    }
 };
+
+
+
