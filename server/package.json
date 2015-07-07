@@ -1,0 +1,9 @@
+{
+  "name": "geo-awesomeness",
+  "description": "Testing some geo location stuff",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "3.x",
+    "body-parser": "1.13.2"
+  }
+}
