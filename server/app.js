@@ -10,6 +10,7 @@ app.get('/', function(req, res) {
 });
 
 app.post('/mylocation', function(req, res){
+    res.setHeader('Access-Control-Allow-Origin', '*');
     if( !req.body.hasOwnProperty('id')   ||
         !req.body.hasOwnProperty('poll') ||
         !req.body.hasOwnProperty('latitude') ||
@@ -40,6 +41,6 @@ app.get('/getlocations/:poll', function(req, res){
     res.json(polls[req.params.poll])
 });
 
-app.listen(process.env.PORT || 80);
+app.listen(process.env.PORT || 4000);
 
 
