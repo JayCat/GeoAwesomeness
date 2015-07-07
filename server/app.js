@@ -29,7 +29,7 @@ app.post('/mylocation', function(req, res){
     polls[poll][id]['latitude'] = req.body.latitude;
     polls[poll][id]['longitude'] = req.body.longitude;
 
-    res.json(true)
+    res.json(polls[poll])
 });
 
 app.get('/getlocations/:poll', function(req, res){
